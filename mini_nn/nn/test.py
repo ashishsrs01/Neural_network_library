@@ -13,21 +13,32 @@ print(a * b)
 
 print(a.shape())
 
-# m = Tensor([
-#     [1, 2],
-#     [3, 4]
-# ])
+m = Tensor([
+    [1, 2],
+    [3, 4]
+])
 
-# print(m)
-# print(m.shape())
+print(m)
+print(m.shape())
 
 a = Tensor([[1, 2]])
 b = Tensor([[3],
             [4]])
 
-#c = a.matmul(b)
 
 c = a @ b
-
 print(c)
 
+
+a = Tensor([10, 20, 30])
+b = Tensor([2,2,2])
+print(a + b)
+
+x = Tensor([[1,2],[3,4]])
+
+y = Tensor([[5,6],[7,8]])
+
+print(x + y)
+
+a = x @ y
+print(a)
