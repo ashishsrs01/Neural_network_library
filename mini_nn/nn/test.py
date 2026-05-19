@@ -42,3 +42,8 @@ print(x + y)
 
 a = x @ y
 print(a)
+
+x = Tensor([3.0], requires_grad=True)
+print(x.data)
+print(x.grad)
+print(x.requires_grad)
