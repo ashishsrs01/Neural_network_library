@@ -1,6 +1,6 @@
 from tensor import Tensor
 
-
+'''
 a = Tensor([1, 2, 3])
 b = Tensor([4, 5, 6])
 
@@ -43,7 +43,18 @@ print(x + y)
 a = x @ y
 print(a)
 
-x = Tensor([3.0], requires_grad=True)
-print(x.data)
-print(x.grad)
-print(x.requires_grad)
+x = Tensor([3.0])
+print(x)'''
+
+x = Tensor(2.0)
+y = Tensor(3.0)
+
+z = x * y
+
+print(z._prev)
+print(z._op)
+
+z.backward()
+print(x)
+print(y)
+print(z)

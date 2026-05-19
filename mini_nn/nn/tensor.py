@@ -2,10 +2,12 @@ import numpy as np
 
 class Tensor:
 
-    def __init__(self,data, requires_grad = False):
+    def __init__(self,data, _children = (), _op =''):
         self.data = np.array(data, dtype = float)
-        self.requires_grad = requires_grad
-        self.grad = None
+        self.grad = 0
+        self._prev = set(_children)
+        self._op = _op
+        self._backward = lambda: None
 
     def __repr__(self):
         return f"Tensor({self.data}, grad = {self.grad})"
@@ -14,22 +16,64 @@ class Tensor:
         print(self.data)
 
     def __add__(self,other):
-        return Tensor(self.data + other.data)
+        out = Tensor(self.data + other.data, (self, other), '+')
+        
+        def _backward():
+            self.grad += out.grad
+            other.grad += out.grad
+        
+        out._backward = _backward
+        return out
 
     def __sub__(self, other):
-        return Tensor(self.data - other.data)
+        out = Tensor(self.data - other.data, (self, other), '-')
+        
+        def _backward():
+            self.grad += out.grad
+            other.grad -= out.grad
+        
+        out._backward = _backward
+        return out
 
     def __mul__(self,other):
-        return Tensor(self.data * other.data)
+        out = Tensor(self.data * other.data, (self, other), '*')
+
+        def _backward():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        
+        out._backward = _backward
+        return out
 
     def __matmul__(self,other):
-        return Tensor(np.dot(self.data, other.data))
+        out = Tensor(np.dot(self.data, other.data))
+        return out
 
     def square(self):
-        return Tensor(self.data**2)
+        out = Tensor(self.data**2)
+        return out
 
     def shape(self):
         return (self.data.shape)
+
+    def backward(self):
+        # Topological sort of computation graph
+        visited = set()
+        topo = []
+        
+        def build_topo(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev:
+                    build_topo(child)
+                topo.append(v)
+        
+        build_topo(self)
+        
+        # Backward pass
+        self.grad = 1
+        for node in reversed(topo):
+            node._backward()
 
 
 
