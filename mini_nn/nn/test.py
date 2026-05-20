@@ -44,17 +44,59 @@ a = x @ y
 print(a)
 
 x = Tensor([3.0])
-print(x)'''
+print(x)
+
 
 x = Tensor(2.0)
 y = Tensor(3.0)
 
-z = x * y
+a = x * y
+b = a + y
 
-print(z._prev)
-print(z._op)
+b.backward()
+
+print("x:", x)
+print("y:", y)
+print("a:", a)
+print("b:", b
+
+
+a = Tensor(5.0)
+b = Tensor(2.0)
+
+c = a - b
+
+c.backward()
+
+print(a.grad)
+print(b.grad)
+
+x = Tensor(3.0)
+
+y = x ** 2
+
+y.backward()
+
+print("x:", x)
+print("y:", y)
+
+pred = Tensor(4.0)
+target = Tensor(2.0)
+
+loss = (pred - target) ** 2
+
+loss.backward()
+
+print("loss:", loss)
+print("pred grad:", pred.grad)'''
+
+x = Tensor(8.0)
+y = Tensor(2.0)
+
+z = x / y
 
 z.backward()
-print(x)
-print(y)
-print(z)
+
+print("z:", z)
+print("x grad:", x.grad)
+print("y grad:", y.grad)
