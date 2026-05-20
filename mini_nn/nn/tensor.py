@@ -97,6 +97,14 @@ class Tensor:
         other = other if isinstance(other, Tensor) else(Tensor)
         return self * (other**-1)
 
+    def relu(self):
+        out = Tensor(np.maximum(0, self.data), (self,), 'ReLU')
+
+        def _backward():
+            self.grad += (out.data > 0)* out.grad
+        
+        out._backward = _backward
+        return out
         
 
 

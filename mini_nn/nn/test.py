@@ -88,7 +88,7 @@ loss = (pred - target) ** 2
 loss.backward()
 
 print("loss:", loss)
-print("pred grad:", pred.grad)'''
+print("pred grad:", pred.grad)
 
 x = Tensor(8.0)
 y = Tensor(2.0)
@@ -99,4 +99,13 @@ z.backward()
 
 print("z:", z)
 print("x grad:", x.grad)
-print("y grad:", y.grad)
+print("y grad:", y.grad)'''
+
+x = Tensor(-4.0)
+
+y = x.relu()
+
+y.backward()
+
+print(y)
+print(x.grad)
