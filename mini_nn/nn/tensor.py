@@ -96,6 +96,7 @@ class Tensor:
     def __truediv__(self, other):
         other = other if isinstance(other, Tensor) else(Tensor)
         return self * (other**-1)
+
         
 
 
