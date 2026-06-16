@@ -77,7 +77,7 @@ class Tensor:
         build_topo(self)
         
         # Backward pass
-        self.grad = 1
+        self.grad = np.ones_like(self.data)
         for node in reversed(topo):
             node._backward()
 
@@ -119,7 +119,7 @@ class Tensor:
     def _rtruediv_(self, other):
         return Tensor(other) / self
 
-        
+
 
 
 
