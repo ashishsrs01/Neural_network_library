@@ -1,6 +1,8 @@
 from tensor import Tensor
 from neuron import Neuron
 from layer import Layer
+from mlp import MLP
+
 
 '''
 a = Tensor([1, 2, 3])
@@ -138,7 +140,7 @@ print(y)
 y.backward()
 
 for p in n.parameters():
-    print(p)'''
+    print(p)
 
 layer = Layer(3, 2)
 
@@ -151,4 +153,20 @@ loss = out[0] + out[1]
 loss.backward()
 
 for p in layer.parameters():
+    print(p.grad)'''
+
+
+
+
+mlp = MLP(3, [4,4,1])
+
+x = [2.0, 3.0, 4.0]
+
+y = mlp(x)
+
+print(y)
+
+y.backward()
+
+for p in mlp.parameters():
     print(p.grad)
