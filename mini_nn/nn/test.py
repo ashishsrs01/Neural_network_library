@@ -1,5 +1,6 @@
 from tensor import Tensor
 from neuron import Neuron
+from layer import Layer
 
 '''
 a = Tensor([1, 2, 3])
@@ -123,7 +124,7 @@ y = (x * 3 + 5).relu()
 y.backward()
 
 print(y)
-print(x.grad)'''
+print(x.grad)
 
 
 n = Neuron(3)
@@ -137,4 +138,17 @@ print(y)
 y.backward()
 
 for p in n.parameters():
-    print(p)
+    print(p)'''
+
+layer = Layer(3, 2)
+
+x = [2.0, 3.0, 4.0]
+
+out = layer(x)
+
+loss = out[0] + out[1]
+
+loss.backward()
+
+for p in layer.parameters():
+    print(p.grad)

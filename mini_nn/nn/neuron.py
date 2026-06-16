@@ -4,10 +4,10 @@ from tensor import Tensor
 
 class Neuron:
 
-    def __init__(self, nin):
+    def __init__(self, n_in):
 
         self.w = [Tensor(np.random.randn())
-                   for _ in range(nin)]
+                   for _ in range(n_in)]
         
         self.b = Tensor(0.0)
 
