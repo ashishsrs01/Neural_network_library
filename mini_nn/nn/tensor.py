@@ -107,6 +107,19 @@ class Tensor:
         out._backward = _backward
         return out
         
+    def _radd_(self, other):
+        return self + other
+
+    def _rsub_(self, other):
+        return Tensor(other) - self
+
+    def _rmul_(self, other):
+        return self * other
+
+    def _rtruediv_(self, other):
+        return Tensor(other) / self
+
+        
 
 
 
