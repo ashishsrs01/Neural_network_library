@@ -4,7 +4,7 @@ class Tensor:
 
     def __init__(self,data, _children = (), _op =''):
         self.data = np.array(data, dtype = float)
-        self.grad = 0
+        self.grad = np.zeros_like(self.data)
         self._prev = set(_children)
         self._op = _op
         self._backward = lambda: None
@@ -49,6 +49,7 @@ class Tensor:
         return out
 
     def __matmul__(self,other):
+        other = other if isinstance(other, Tensor) else Tensor(other)
         out = Tensor(np.dot(self.data, other.data), (self, other), '@')
         
         def _backward():
@@ -94,7 +95,7 @@ class Tensor:
         return out
 
     def __truediv__(self, other):
-        other = other if isinstance(other, Tensor) else(Tensor)
+        other = other if isinstance(other, Tensor) else Tensor(other)
         return self * (other**-1)
 
     def relu(self):

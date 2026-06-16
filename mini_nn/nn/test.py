@@ -99,11 +99,25 @@ z.backward()
 
 print("z:", z)
 print("x grad:", x.grad)
-print("y grad:", y.grad)'''
+print("y grad:", y.grad)
 
 x = Tensor(-4.0)
+a = Tensor(4.0)
 
 y = x.relu()
+b = a.relu()
+
+y.backward()
+b.backward()
+
+print(y)
+print(x.grad)
+print(b)
+print(y.grad)'''
+
+x = Tensor(2.0)
+
+y = (x * 3 + 5).relu()
 
 y.backward()
 
