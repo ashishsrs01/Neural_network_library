@@ -4,7 +4,7 @@ from optimizer import SGD
 
 model = MLP(2, [4,1])
 
-optimizer = SGD(model.parameters(), lr = 0.01)
+optimizer = SGD(model.parameters(), lr = 0.05)
 
 xs = [
     [0.0, 0.0],
@@ -21,7 +21,7 @@ ys = [
 ]
 
 
-for epoch in range(1000):
+for epoch in range(5000):
 
     total_loss = None
 
