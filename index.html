@@ -731,6 +731,293 @@
             background: var(--border);
         }
 
+        /* ===== GRAPH EXPLANATION ===== */
+        .graph-explainer {
+            margin-top: 2.5rem;
+        }
+
+        .explainer-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .explainer-header-icon {
+            width: 40px; height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-amber);
+            flex-shrink: 0;
+        }
+
+        .explainer-header h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .explainer-header h3 .for-beginners {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-amber);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .explainer-intro {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-width: 700px;
+            margin-bottom: 2rem;
+        }
+
+        .explainer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .explainer-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            position: relative;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .explainer-card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .explainer-card-number {
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .explainer-card .card-visual {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .explainer-card .card-swatch {
+            width: 36px; height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .explainer-card h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.1rem;
+        }
+
+        .explainer-card .card-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+        }
+
+        .explainer-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.65;
+        }
+
+        .explainer-callout {
+            background: rgba(59, 130, 246, 0.06);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .explainer-callout .callout-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .explainer-callout h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 0.4rem;
+        }
+
+        .explainer-callout p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.65;
+        }
+
+        .explainer-steps {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .explainer-steps h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .step-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .step-number {
+            min-width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--text-tertiary);
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+            transition: border-color 0.3s, color 0.3s;
+        }
+
+        .step-list li:hover .step-number {
+            border-color: var(--accent-violet);
+            color: var(--accent-violet);
+        }
+
+        .step-content strong {
+            color: var(--text-primary);
+            font-size: 0.88rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.83rem;
+            line-height: 1.6;
+            margin-top: 0.15rem;
+        }
+
+        .explainer-glossary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .glossary-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.25rem;
+            transition: border-color 0.2s;
+        }
+
+        .glossary-item:hover {
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+
+        .glossary-item dt {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 0.35rem;
+        }
+
+        .glossary-item dd {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.55;
+        }
+
+        .explainer-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-sans);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .explainer-toggle:hover {
+            border-color: var(--accent-amber);
+            color: var(--accent-amber);
+        }
+
+        .explainer-toggle .toggle-arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.7rem;
+        }
+
+        .explainer-toggle.expanded .toggle-arrow {
+            transform: rotate(90deg);
+        }
+
+        .explainer-collapsible {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .explainer-collapsible.open {
+            max-height: 3000px;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -767,6 +1054,7 @@
                 <li><a href="#features">Features</a></li>
                 <li><a href="#architecture">Architecture</a></li>
                 <li><a href="#demo">Live Demo</a></li>
+                <li><a href="#graph-guide">Guide</a></li>
                 <li><a href="#examples">Examples</a></li>
             </ul>
             <a href="https://github.com/ashishsrs/Neural_network_library" class="nav-cta" target="_blank" rel="noopener">
@@ -943,7 +1231,7 @@ b.<span class="fn">backward</span>()
     <div class="divider"></div>
 
     <!-- INTERACTIVE DEMO -->
-    <section class="demo-section" id="demo">
+    <section class="demo-section" id="demo" style="scroll-margin-top: 80px;">
         <span class="section-label fade-in">Interactive</span>
         <h2 class="section-title fade-in">Watch the network think</h2>
         <p class="section-desc fade-in">Visualize how data flows through layers. Change the architecture and watch the network reconfigure in real time.</p>
@@ -981,6 +1269,199 @@ b.<span class="fn">backward</span>()
                 <div class="legend-item">
                     <span class="legend-circle" style="border-color: #71717a;"></span>
                     Inactive neuron
+                </div>
+            </div>
+        </div>
+
+        <!-- BEGINNER EXPLANATION -->
+        <div class="graph-explainer fade-in" id="graph-guide" style="scroll-margin-top: 80px;">
+            <div class="explainer-header">
+                <div class="explainer-header-icon">💡</div>
+                <h3>Understanding the Visualization <span class="for-beginners">For Beginners</span></h3>
+            </div>
+            <p class="explainer-intro">
+                New to neural networks? Don't worry — this interactive graph above shows you how a neural network is structured and how data flows through it. Here's what every element means:
+            </p>
+
+            <button class="explainer-toggle expanded" id="explainer-toggle">
+                <span class="toggle-arrow">▶</span>
+                Hide explanation
+            </button>
+
+            <div class="explainer-collapsible open" id="explainer-content">
+
+                <!-- Visual element cards -->
+                <div class="explainer-grid">
+                    <div class="explainer-card">
+                        <div class="explainer-card-number">1</div>
+                        <div class="card-visual">
+                            <div class="card-swatch" style="background: rgba(16,185,129,0.12); border: 2px solid #10b981; border-radius: 50%;">
+                            </div>
+                            <div>
+                                <h4>Circles = Neurons</h4>
+                                <span class="card-subtitle">the "brain cells"</span>
+                            </div>
+                        </div>
+                        <p>Each circle represents a <strong>neuron</strong> — a tiny unit that receives numbers, does a simple calculation, and passes the result forward. The number shown inside (like 0.73) is its current <strong>activation value</strong>.</p>
+                    </div>
+
+                    <div class="explainer-card">
+                        <div class="explainer-card-number">2</div>
+                        <div class="card-visual">
+                            <div class="card-swatch" style="background: var(--bg-primary);">
+                                <div style="width: 24px; height: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 2px;"></div>
+                            </div>
+                            <div>
+                                <h4>Lines = Connections</h4>
+                                <span class="card-subtitle">weighted edges</span>
+                            </div>
+                        </div>
+                        <p>Lines connecting neurons are <strong>weights</strong>. They determine how strongly one neuron influences the next. <strong style="color: #3b82f6;">Blue lines</strong> = positive influence ("excite"), <strong style="color: #f43f5e;">Red lines</strong> = negative influence ("inhibit"). Thicker = stronger.</p>
+                    </div>
+
+                    <div class="explainer-card">
+                        <div class="explainer-card-number">3</div>
+                        <div class="card-visual">
+                            <div class="card-swatch" style="background: rgba(59,130,246,0.12);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><path d="M4 12h16M12 4l8 8-8 8"/></svg>
+                            </div>
+                            <div>
+                                <h4>Columns = Layers</h4>
+                                <span class="card-subtitle">Input → Hidden → Output</span>
+                            </div>
+                        </div>
+                        <p>Neurons are organized in <strong>layers</strong>. Data enters from the <strong>Input</strong> layer on the left, passes through one or more <strong>Hidden</strong> layers in the middle (where learning happens), and exits at the <strong>Output</strong> layer on the right.</p>
+                    </div>
+
+                    <div class="explainer-card">
+                        <div class="explainer-card-number">4</div>
+                        <div class="card-visual">
+                            <div class="card-swatch" style="background: rgba(16,185,129,0.15);">
+                                <div style="width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,0.6), transparent);"></div>
+                            </div>
+                            <div>
+                                <h4>Glow = Activation</h4>
+                                <span class="card-subtitle">how "fired up" a neuron is</span>
+                            </div>
+                        </div>
+                        <p>A neuron with a <strong>green glow</strong> has a high activation (> 0.5) — it's "firing" strongly. Dim neurons are less active. This is like a light bulb: brighter = more active = contributing more to the final answer.</p>
+                    </div>
+
+                    <div class="explainer-card">
+                        <div class="explainer-card-number">5</div>
+                        <div class="card-visual">
+                            <div class="card-swatch" style="background: rgba(139,92,246,0.12);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            </div>
+                            <div>
+                                <h4>Forward Pass</h4>
+                                <span class="card-subtitle">data flows left → right</span>
+                            </div>
+                        </div>
+                        <p>Click <strong>"Forward Pass"</strong> to watch data flow through the network. The green pulse animation shows values traveling layer by layer — this is exactly how a real neural network makes a prediction.</p>
+                    </div>
+
+                    <div class="explainer-card">
+                        <div class="explainer-card-number">6</div>
+                        <div class="card-visual">
+                            <div class="card-swatch" style="background: rgba(245,158,11,0.12);">
+                                <span style="font-size: 1.1rem;">🔧</span>
+                            </div>
+                            <div>
+                                <h4>Architecture Input</h4>
+                                <span class="card-subtitle">e.g. "2, 4, 4, 1"</span>
+                            </div>
+                        </div>
+                        <p>The text field ("2, 4, 4, 1") defines the network shape. It means: <strong>2 input neurons</strong>, then <strong>4 + 4 hidden</strong>, then <strong>1 output</strong>. Try changing it to "3, 8, 8, 2" and click <strong>Rebuild</strong> to see a bigger network!</p>
+                    </div>
+                </div>
+
+                <!-- Analogy callout -->
+                <div class="explainer-callout">
+                    <span class="callout-icon">🧠</span>
+                    <div>
+                        <h4>Think of it like a factory assembly line</h4>
+                        <p>
+                            Imagine raw materials (data) entering on the left. Each worker (neuron) in the factory takes what they receive, does a small transformation, and passes it to the next station. The connections (weights) determine how much of each piece gets passed along. By the end of the line, the raw materials have been transformed into a finished product (prediction). <strong>Training</strong> is like the factory adjusting each worker's recipe until the output is exactly what's needed.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- How to read it -->
+                <div class="explainer-steps">
+                    <h4>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-violet)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                        How to Read the Graph — Step by Step
+                    </h4>
+                    <ol class="step-list">
+                        <li>
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <strong>Look at the leftmost column (Input Layer)</strong>
+                                <p>These neurons represent the raw data going into the network. For example, in an XOR problem, they'd hold two binary values like 0 and 1.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <strong>Follow the lines to the middle (Hidden Layers)</strong>
+                                <p>Each hidden neuron multiplies incoming values by connection weights, sums them up, adds a bias, and applies an activation function. This is where the network learns complex patterns.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">3</span>
+                            <div class="step-content">
+                                <strong>Check the rightmost column (Output Layer)</strong>
+                                <p>The final neuron(s) produce the network's prediction. After many training rounds, this output should closely match the expected answer.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">4</span>
+                            <div class="step-content">
+                                <strong>Click "Forward Pass" and watch the animation</strong>
+                                <p>The green pulse traveling left-to-right is a forward pass — the exact computation that happens when a neural network makes a prediction. Each layer processes data before passing it on.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">5</span>
+                            <div class="step-content">
+                                <strong>Hover over any neuron</strong>
+                                <p>Hovering highlights a neuron and shows its current activation value. Notice how neurons with values closer to 1.0 glow brighter — they're contributing more to the output.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <!-- Glossary -->
+                <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+                    Quick Glossary
+                </h4>
+                <div class="explainer-glossary">
+                    <dl class="glossary-item">
+                        <dt>Neuron</dt>
+                        <dd>A single computing unit that receives inputs, applies weights, sums them, and outputs a value through an activation function.</dd>
+                    </dl>
+                    <dl class="glossary-item">
+                        <dt>Weight</dt>
+                        <dd>A number that controls how much one neuron's output influences the next neuron. Adjusted during training.</dd>
+                    </dl>
+                    <dl class="glossary-item">
+                        <dt>Activation</dt>
+                        <dd>The output value of a neuron (0 to 1). Higher activation means the neuron is "more active" or more confident.</dd>
+                    </dl>
+                    <dl class="glossary-item">
+                        <dt>Layer</dt>
+                        <dd>A group of neurons at the same depth. Networks have input, hidden, and output layers.</dd>
+                    </dl>
+                    <dl class="glossary-item">
+                        <dt>Forward Pass</dt>
+                        <dd>The process of sending data through the network from input to output to get a prediction.</dd>
+                    </dl>
+                    <dl class="glossary-item">
+                        <dt>Backpropagation</dt>
+                        <dd>After a forward pass, the error is sent backward through the network to adjust weights — this is how the network learns.</dd>
+                    </dl>
                 </div>
             </div>
         </div>
@@ -1145,6 +1626,19 @@ z <span class="op">=</span> <span class="cls">Tensor</span>(<span class="num">-2
         });
     }, { threshold: 0.1 });
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    /* ===== EXPLAINER TOGGLE ===== */
+    (function() {
+        const toggle = document.getElementById('explainer-toggle');
+        const content = document.getElementById('explainer-content');
+        if (toggle && content) {
+            toggle.addEventListener('click', () => {
+                const isOpen = content.classList.toggle('open');
+                toggle.classList.toggle('expanded', isOpen);
+                toggle.innerHTML = `<span class="toggle-arrow">▶</span> ${isOpen ? 'Hide explanation' : 'Show full explanation'}`;
+            });
+        }
+    })();
 
     /* ===== HERO BACKGROUND CANVAS (Floating Particles) ===== */
     (function() {
