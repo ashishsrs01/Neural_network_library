@@ -3,251 +3,1283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Neural Network Visualizer</title>
-    <meta name="description" content="Interactive visualization for the Mini Neural Network Python library.">
+    <title>mini_nn — A Neural Network Library Built from Scratch</title>
+    <meta name="description" content="A lightweight, educational deep learning library built from scratch using pure Python and NumPy. Learn autograd, backpropagation, and neural networks from first principles.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-color: #0f172a;
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --primary: #3b82f6;
-            --secondary: #8b5cf6;
-            --accent: #10b981;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-primary: #09090b;
+            --bg-secondary: #111113;
+            --bg-card: #18181b;
+            --bg-elevated: #1e1e22;
+            --border: #27272a;
+            --border-subtle: #1c1c1f;
+
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+
+            --accent-blue: #3b82f6;
+            --accent-violet: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+
+            --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --gradient-hero: linear-gradient(160deg, #3b82f6 0%, #8b5cf6 40%, #06b6d4 100%);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+            --shadow-glow: 0 0 60px rgba(59, 130, 246, 0.15);
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        /* Glassmorphism Header */
-        header {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1rem 2rem;
+        a { color: var(--accent-blue); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--accent-cyan); }
+
+        /* ===== NAV ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 0 2rem;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        nav.scrolled {
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 1px 0 var(--border);
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 10;
+            height: 64px;
         }
 
-        h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .controls {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        button {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
+        .nav-brand {
+            font-family: var(--font-mono);
             font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            outline: none;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-        }
-
-        .config {
-            background: rgba(0,0,0,0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--glass-border);
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .config span {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        main {
-            flex: 1;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .info-panel {
-            position: absolute;
-            bottom: 2rem;
-            left: 2rem;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            padding: 1.5rem;
-            border-radius: 16px;
-            width: 320px;
-            z-index: 10;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transform: translateY(0);
-            transition: all 0.3s ease;
-        }
-
-        .info-panel h2 {
-            margin-top: 0;
-            font-size: 1.2rem;
-            color: var(--accent);
-        }
-
-        .info-panel p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        .layer-control {
+            font-size: 1.15rem;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
-        .layer-control input {
-            width: 60px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid var(--glass-border);
-            color: white;
-            border-radius: 4px;
-            padding: 0.3rem;
-            text-align: center;
-            font-family: 'Inter', sans-serif;
+
+        .nav-brand .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            box-shadow: 0 0 8px var(--accent-emerald);
+            animation: pulse-dot 2s ease-in-out infinite;
         }
 
-        .layer-control input:focus {
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text-primary); }
+
+        .nav-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .nav-cta:hover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.08);
+            color: var(--text-primary);
+        }
+
+        .nav-cta svg { width: 18px; height: 18px; }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 6rem;
+            overflow: hidden;
+        }
+
+        .hero-bg-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 1;
+        }
+
+        .hero-radial {
+            position: absolute;
+            width: 800px; height: 800px;
+            border-radius: 50%;
+            top: -200px; left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            color: var(--accent-blue);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 2rem;
+        }
+
+        .hero-badge .badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 .gradient-text {
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-tertiary);
+            background: var(--bg-card);
+            color: white;
+        }
+
+        .hero-install {
+            margin-top: 3rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .hero-install:hover { border-color: var(--text-tertiary); }
+        .hero-install .prompt { color: var(--accent-emerald); }
+        .hero-install .cmd { color: var(--text-primary); }
+        .hero-install .copy-icon {
+            color: var(--text-tertiary);
+            transition: color 0.2s;
+        }
+        .hero-install:hover .copy-icon { color: var(--text-primary); }
+
+        /* ===== SECTIONS ===== */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 600px;
+            line-height: 1.7;
+            margin-bottom: 3rem;
+        }
+
+        /* ===== FEATURES GRID ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            width: 48px; height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .feature-icon.blue { background: rgba(59, 130, 246, 0.12); color: var(--accent-blue); }
+        .feature-icon.violet { background: rgba(139, 92, 246, 0.12); color: var(--accent-violet); }
+        .feature-icon.cyan { background: rgba(6, 182, 212, 0.12); color: var(--accent-cyan); }
+        .feature-icon.emerald { background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); }
+        .feature-icon.amber { background: rgba(245, 158, 11, 0.12); color: var(--accent-amber); }
+        .feature-icon.rose { background: rgba(244, 63, 94, 0.12); color: var(--accent-rose); }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ===== ARCHITECTURE ===== */
+        .arch-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .arch-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .arch-node {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .arch-node:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .arch-connector {
+            display: flex;
+            justify-content: center;
+            padding: 0.25rem 0;
+        }
+
+        .arch-connector svg { color: var(--text-tertiary); }
+
+        .arch-node-icon {
+            width: 40px; height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .arch-node h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+        }
+
+        .arch-node p {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            margin: 0;
+        }
+
+        .arch-code-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .code-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+
+        .code-dot.red { background: #ef4444; }
+        .code-dot.yellow { background: #eab308; }
+        .code-dot.green { background: #22c55e; }
+
+        .code-filename {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-left: 0.5rem;
+        }
+
+        pre {
+            margin: 0;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        pre .kw { color: var(--accent-violet); }
+        pre .fn { color: var(--accent-blue); }
+        pre .str { color: var(--accent-emerald); }
+        pre .num { color: var(--accent-amber); }
+        pre .cm { color: var(--text-tertiary); font-style: italic; }
+        pre .op { color: var(--accent-cyan); }
+        pre .cls { color: var(--accent-cyan); }
+        pre .self { color: var(--accent-rose); }
+        pre .param { color: #fb923c; }
+
+        /* ===== INTERACTIVE DEMO ===== */
+        .demo-section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .demo-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .demo-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .demo-toolbar-left label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .demo-toolbar-left input[type="text"] {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            padding: 0.45rem 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            width: 160px;
             outline: none;
-            border-color: var(--primary);
+            transition: border-color 0.2s;
+        }
+
+        .demo-toolbar-left input[type="text"]:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .demo-canvas-wrap {
+            position: relative;
+            height: 480px;
+            background: var(--bg-primary);
+        }
+
+        .demo-canvas-wrap canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .demo-legend {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+        }
+
+        .legend-swatch {
+            width: 12px; height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-circle {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+
+        /* ===== CODE EXAMPLE ===== */
+        .code-section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .code-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: -1px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .code-tab {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            padding: 0.6rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .code-tab.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .code-tab:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        .code-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .code-block pre { display: none; }
+        .code-block pre.active { display: block; }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 3rem 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .stats-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat h3 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat p {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        footer p {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        footer .footer-links {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        footer .footer-links a {
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+
+        footer .footer-links a:hover { color: var(--text-primary); }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .arch-container { grid-template-columns: 1fr; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .features-grid { grid-template-columns: 1fr; }
+            .hero-actions { flex-direction: column; align-items: center; }
+            .demo-canvas-wrap { height: 320px; }
+        }
+
+        /* ===== FADE-IN ANIMATION ===== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Mini Neural Network</h1>
-        <div class="controls">
-            <div class="config">
-                <div class="layer-control">
-                    <span>Architecture:</span>
-                    <input type="text" id="arch" value="2,4,4,1" title="Comma separated layer sizes">
+    <!-- NAV -->
+    <nav id="main-nav">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <span class="dot"></span>
+                mini_nn
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#demo">Live Demo</a></li>
+                <li><a href="#examples">Examples</a></li>
+            </ul>
+            <a href="https://github.com/ashishsrs/Neural_network_library" class="nav-cta" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-radial"></div>
+        <div class="hero-grid-overlay"></div>
+        <canvas class="hero-bg-canvas" id="hero-canvas"></canvas>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                Open Source · Educational · Pure Python
+            </div>
+            <h1>
+                Neural Networks<br>
+                <span class="gradient-text">From First Principles</span>
+            </h1>
+            <p class="hero-subtitle">
+                A lightweight autograd engine and neural network library built entirely from scratch. Understand backpropagation, computational graphs, and gradient descent — no magic, just math.
+            </p>
+            <div class="hero-actions">
+                <a href="#demo" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Live Demo
+                </a>
+                <a href="#examples" class="btn btn-secondary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                    View Code
+                </a>
+            </div>
+            <div class="hero-install" id="install-cmd" title="Click to copy">
+                <span class="prompt">$</span>
+                <span class="cmd">git clone https://github.com/ashishsrs/Neural_network_library.git</span>
+                <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+        <div class="stats-inner">
+            <div class="stat fade-in"><h3>8</h3><p>Core Modules</p></div>
+            <div class="stat fade-in"><h3>6</h3><p>Differentiable Ops</p></div>
+            <div class="stat fade-in"><h3>4</h3><p>Activation Functions</p></div>
+            <div class="stat fade-in"><h3>0</h3><p>External Dependencies*</p></div>
+        </div>
+    </div>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <span class="section-label fade-in">Features</span>
+        <h2 class="section-title fade-in">Everything you need to learn deep learning internals</h2>
+        <p class="section-desc fade-in">Each component is implemented with clarity in mind — readable code over raw performance.</p>
+
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon blue">⚡</div>
+                <h3>Autograd Engine</h3>
+                <p>Reverse-mode automatic differentiation with dynamic computational graph construction. Gradients flow backward through the chain rule — exactly like PyTorch.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon violet">🧮</div>
+                <h3>Tensor Operations</h3>
+                <p>Add, subtract, multiply, divide, power, and matrix multiply — every operation records its backward function for gradient computation.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon cyan">🔗</div>
+                <h3>Computational Graph</h3>
+                <p>Operations on Tensors build a directed acyclic graph (DAG). Topological sort ensures correct backward traversal order.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon emerald">🧠</div>
+                <h3>Neural Network Layers</h3>
+                <p>Neuron → Layer → MLP. Build arbitrarily deep multi-layer perceptrons with a clean, composable API.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon amber">📉</div>
+                <h3>SGD Optimizer</h3>
+                <p>Stochastic Gradient Descent with configurable learning rate. <code>zero_grad()</code> → <code>backward()</code> → <code>step()</code> — the classic training loop.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon rose">🎯</div>
+                <h3>Activations & Loss</h3>
+                <p>Tanh, Sigmoid, ReLU activations and MSE loss — all with correct backward gradients for end-to-end training.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture">
+        <span class="section-label fade-in">Architecture</span>
+        <h2 class="section-title fade-in">How the pieces fit together</h2>
+        <p class="section-desc fade-in">From raw numbers to trained networks — follow data through the entire pipeline.</p>
+
+        <div class="arch-container fade-in">
+            <div class="arch-flow">
+                <div class="arch-node">
+                    <div class="arch-node-icon" style="background: rgba(59,130,246,0.12); color: var(--accent-blue);">T</div>
+                    <div>
+                        <h4>Tensor</h4>
+                        <p>N-dimensional data + gradient tracking</p>
+                    </div>
+                </div>
+                <div class="arch-connector">
+                    <svg width="24" height="32" viewBox="0 0 24 32"><path d="M12 0 L12 24 M6 18 L12 24 L18 18" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                </div>
+                <div class="arch-node">
+                    <div class="arch-node-icon" style="background: rgba(139,92,246,0.12); color: var(--accent-violet);">N</div>
+                    <div>
+                        <h4>Neuron</h4>
+                        <p>Weights · bias · activation → single output</p>
+                    </div>
+                </div>
+                <div class="arch-connector">
+                    <svg width="24" height="32" viewBox="0 0 24 32"><path d="M12 0 L12 24 M6 18 L12 24 L18 18" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                </div>
+                <div class="arch-node">
+                    <div class="arch-node-icon" style="background: rgba(6,182,212,0.12); color: var(--accent-cyan);">L</div>
+                    <div>
+                        <h4>Layer</h4>
+                        <p>Collection of neurons → dense transformation</p>
+                    </div>
+                </div>
+                <div class="arch-connector">
+                    <svg width="24" height="32" viewBox="0 0 24 32"><path d="M12 0 L12 24 M6 18 L12 24 L18 18" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                </div>
+                <div class="arch-node">
+                    <div class="arch-node-icon" style="background: rgba(16,185,129,0.12); color: var(--accent-emerald);">M</div>
+                    <div>
+                        <h4>MLP</h4>
+                        <p>Stacked layers → full network</p>
+                    </div>
                 </div>
             </div>
-            <button id="update-btn">Update Graph</button>
-            <button id="animate-btn">Forward Pass</button>
-        </div>
-    </header>
 
-    <main>
-        <canvas id="network-canvas"></canvas>
-        
-        <div class="info-panel">
-            <h2>Interactive Visualization</h2>
-            <p>Welcome to the <strong>Mini Neural Network</strong> visualizer. This tool brings the underlying Python library to life directly in your browser.</p>
-            <p>Modify the architecture (e.g., <code>3,5,2</code>) and click <strong>Update Graph</strong> to reconstruct the network layout dynamically.</p>
-            <p>Click <strong>Forward Pass</strong> to visualize data flowing through the weights to compute activations.</p>
+            <div class="arch-code-panel">
+                <div class="code-header">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                    <span class="code-filename">backpropagation.py</span>
+                </div>
+                <pre>
+<span class="cm"># Forward pass builds the graph</span>
+x <span class="op">=</span> <span class="cls">Tensor</span>(<span class="num">2.0</span>)
+y <span class="op">=</span> <span class="cls">Tensor</span>(<span class="num">3.0</span>)
+
+a <span class="op">=</span> x <span class="op">*</span> y       <span class="cm"># a = 6.0</span>
+b <span class="op">=</span> a <span class="op">+</span> y       <span class="cm"># b = 9.0</span>
+
+<span class="cm"># Backward pass computes gradients</span>
+b.<span class="fn">backward</span>()
+
+<span class="cm"># Gradients via chain rule:</span>
+<span class="cm"># db/dx = db/da · da/dx = 1 · y = 3</span>
+<span class="cm"># db/dy = db/da · da/dy + db/dy</span>
+<span class="cm">#       = 1 · x + 1 = 2 + 1 = 3</span>
+
+<span class="kw">print</span>(x.grad)   <span class="cm"># → 3.0</span>
+<span class="kw">print</span>(y.grad)   <span class="cm"># → 3.0</span>
+                </pre>
+            </div>
         </div>
-    </main>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- INTERACTIVE DEMO -->
+    <section class="demo-section" id="demo">
+        <span class="section-label fade-in">Interactive</span>
+        <h2 class="section-title fade-in">Watch the network think</h2>
+        <p class="section-desc fade-in">Visualize how data flows through layers. Change the architecture and watch the network reconfigure in real time.</p>
+
+        <div class="demo-wrapper fade-in">
+            <div class="demo-toolbar">
+                <div class="demo-toolbar-left">
+                    <label>Architecture</label>
+                    <input type="text" id="demo-arch" value="2, 4, 4, 1" spellcheck="false">
+                    <button class="btn btn-primary" id="demo-rebuild" style="padding: 0.45rem 1rem; font-size: 0.82rem;">Rebuild</button>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" id="demo-forward" style="padding: 0.45rem 1rem; font-size: 0.82rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Forward Pass
+                    </button>
+                </div>
+            </div>
+            <div class="demo-canvas-wrap">
+                <canvas id="demo-canvas"></canvas>
+            </div>
+            <div class="demo-legend">
+                <div class="legend-item">
+                    <span class="legend-swatch" style="background: #3b82f6;"></span>
+                    Positive weight
+                </div>
+                <div class="legend-item">
+                    <span class="legend-swatch" style="background: #f43f5e;"></span>
+                    Negative weight
+                </div>
+                <div class="legend-item">
+                    <span class="legend-circle" style="border-color: #10b981;"></span>
+                    Active neuron
+                </div>
+                <div class="legend-item">
+                    <span class="legend-circle" style="border-color: #71717a;"></span>
+                    Inactive neuron
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- CODE EXAMPLES -->
+    <section class="code-section" id="examples">
+        <span class="section-label fade-in">Examples</span>
+        <h2 class="section-title fade-in">See it in action</h2>
+        <p class="section-desc fade-in">Real, runnable code from the repository. Train on XOR, fit a regression, or explore activations.</p>
+
+        <div class="fade-in">
+            <div class="code-tabs">
+                <div class="code-tab active" data-tab="xor">xor.py</div>
+                <div class="code-tab" data-tab="train">train.py</div>
+                <div class="code-tab" data-tab="tensor">tensor_ops.py</div>
+            </div>
+            <div class="code-block">
+                <pre class="active" id="tab-xor">
+<span class="kw">from</span> mini_nn.nn.tensor <span class="kw">import</span> <span class="cls">Tensor</span>
+<span class="kw">from</span> mini_nn.nn.mlp <span class="kw">import</span> <span class="cls">MLP</span>
+<span class="kw">from</span> mini_nn.nn.optimizer <span class="kw">import</span> <span class="cls">SGD</span>
+
+<span class="cm"># XOR — not linearly separable</span>
+xs <span class="op">=</span> [[<span class="num">0</span>, <span class="num">0</span>], [<span class="num">0</span>, <span class="num">1</span>], [<span class="num">1</span>, <span class="num">0</span>], [<span class="num">1</span>, <span class="num">1</span>]]
+ys <span class="op">=</span> [<span class="num">0.0</span>, <span class="num">1.0</span>, <span class="num">1.0</span>, <span class="num">0.0</span>]
+
+<span class="cm"># 2 inputs → 4 hidden → 1 output</span>
+model <span class="op">=</span> <span class="cls">MLP</span>(<span class="num">2</span>, [<span class="num">4</span>, <span class="num">1</span>])
+optimizer <span class="op">=</span> <span class="cls">SGD</span>(model.<span class="fn">parameters</span>(), lr<span class="op">=</span><span class="num">0.05</span>)
+
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5000</span>):
+    optimizer.<span class="fn">zero_grad</span>()
+    total_loss <span class="op">=</span> <span class="kw">None</span>
+
+    <span class="kw">for</span> x, y_true <span class="kw">in</span> <span class="fn">zip</span>(xs, ys):
+        pred <span class="op">=</span> model(x)
+        loss <span class="op">=</span> (pred <span class="op">-</span> y_true) <span class="op">**</span> <span class="num">2</span>
+        total_loss <span class="op">=</span> loss <span class="kw">if</span> total_loss <span class="kw">is</span> <span class="kw">None</span> <span class="kw">else</span> total_loss <span class="op">+</span> loss
+
+    total_loss.<span class="fn">backward</span>()
+    optimizer.<span class="fn">step</span>()
+
+<span class="cm"># Predictions converge to XOR truth table</span>
+<span class="kw">for</span> x <span class="kw">in</span> xs:
+    <span class="kw">print</span>(x, <span class="str">"→"</span>, model(x))
+                </pre>
+                <pre id="tab-train">
+<span class="kw">from</span> tensor <span class="kw">import</span> <span class="cls">Tensor</span>
+<span class="kw">from</span> mlp <span class="kw">import</span> <span class="cls">MLP</span>
+<span class="kw">from</span> optimizer <span class="kw">import</span> <span class="cls">SGD</span>
+
+model <span class="op">=</span> <span class="cls">MLP</span>(<span class="num">2</span>, [<span class="num">4</span>, <span class="num">1</span>])
+optimizer <span class="op">=</span> <span class="cls">SGD</span>(model.<span class="fn">parameters</span>(), lr<span class="op">=</span><span class="num">0.05</span>)
+
+xs <span class="op">=</span> [[<span class="num">0.0</span>, <span class="num">0.0</span>], [<span class="num">0.0</span>, <span class="num">1.0</span>],
+      [<span class="num">1.0</span>, <span class="num">0.0</span>], [<span class="num">1.0</span>, <span class="num">1.0</span>]]
+ys <span class="op">=</span> [<span class="num">0.0</span>, <span class="num">1.0</span>, <span class="num">1.0</span>, <span class="num">0.0</span>]
+
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5000</span>):
+    total_loss <span class="op">=</span> <span class="kw">None</span>
+    optimizer.<span class="fn">zero_grad</span>()
+
+    <span class="kw">for</span> x, y_true <span class="kw">in</span> <span class="fn">zip</span>(xs, ys):
+        pred <span class="op">=</span> model(x)
+        loss <span class="op">=</span> (pred <span class="op">-</span> y_true) <span class="op">**</span> <span class="num">2</span>
+        <span class="kw">if</span> total_loss <span class="kw">is</span> <span class="kw">None</span>:
+            total_loss <span class="op">=</span> loss
+        <span class="kw">else</span>:
+            total_loss <span class="op">+=</span> loss
+
+    total_loss.<span class="fn">backward</span>()
+    optimizer.<span class="fn">step</span>()
+
+    <span class="kw">if</span> epoch <span class="op">%</span> <span class="num">100</span> <span class="op">==</span> <span class="num">0</span>:
+        <span class="kw">print</span>(epoch, total_loss.data)
+
+<span class="kw">print</span>(<span class="str">"\nPredictions:"</span>)
+<span class="kw">for</span> x <span class="kw">in</span> xs:
+    <span class="kw">print</span>(x, <span class="str">"→"</span>, model(x))
+                </pre>
+                <pre id="tab-tensor">
+<span class="kw">from</span> mini_nn.nn.tensor <span class="kw">import</span> <span class="cls">Tensor</span>
+
+<span class="cm"># Basic operations</span>
+a <span class="op">=</span> <span class="cls">Tensor</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+b <span class="op">=</span> <span class="cls">Tensor</span>([<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>])
+c <span class="op">=</span> a <span class="op">+</span> b       <span class="cm"># [5, 7, 9]</span>
+d <span class="op">=</span> a <span class="op">*</span> b       <span class="cm"># [4, 10, 18]</span>
+
+<span class="cm"># Matrix multiplication</span>
+m1 <span class="op">=</span> <span class="cls">Tensor</span>([[<span class="num">1</span>, <span class="num">2</span>]])
+m2 <span class="op">=</span> <span class="cls">Tensor</span>([[<span class="num">3</span>], [<span class="num">4</span>]])
+result <span class="op">=</span> m1 <span class="op">@</span> m2  <span class="cm"># [[11]]</span>
+
+<span class="cm"># Automatic differentiation</span>
+x <span class="op">=</span> <span class="cls">Tensor</span>(<span class="num">3.0</span>)
+y <span class="op">=</span> x <span class="op">**</span> <span class="num">2</span>       <span class="cm"># 9.0</span>
+y.<span class="fn">backward</span>()
+<span class="kw">print</span>(x.grad)  <span class="cm"># → 6.0  (dy/dx = 2x = 6)</span>
+
+<span class="cm"># Activations</span>
+z <span class="op">=</span> <span class="cls">Tensor</span>(<span class="num">-2.0</span>)
+<span class="kw">print</span>(z.<span class="fn">relu</span>())    <span class="cm"># → 0.0</span>
+<span class="kw">print</span>(z.<span class="fn">sigmoid</span>()) <span class="cm"># → 0.119</span>
+<span class="kw">print</span>(z.<span class="fn">tanh</span>())    <span class="cm"># → -0.964</span>
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-brand">mini_nn</div>
+            <p>Built by <strong>Ashish Sharma</strong> · AI & Data Science Student</p>
+            <p style="margin-top: 0.25rem; font-size: 0.8rem;">*NumPy is used for array operations — no ML framework dependencies.</p>
+            <div class="footer-links">
+                <a href="https://github.com/ashishsrs/Neural_network_library" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://github.com/ashishsrs/Neural_network_library/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0 License</a>
+                <a href="https://github.com/ashishsrs/Neural_network_library/issues" target="_blank" rel="noopener">Issues</a>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        const canvas = document.getElementById('network-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
+    /* ===== NAV SCROLL ===== */
+    const nav = document.getElementById('main-nav');
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
 
-        let layers = [];
-        let nodes = [];
-        let edges = [];
-        let animating = false;
-        let animationProgress = 0;
+    /* ===== COPY INSTALL CMD ===== */
+    document.getElementById('install-cmd').addEventListener('click', () => {
+        const cmd = 'git clone https://github.com/ashishsrs/Neural_network_library.git';
+        navigator.clipboard.writeText(cmd).then(() => {
+            const el = document.querySelector('.hero-install .cmd');
+            const orig = el.textContent;
+            el.textContent = 'Copied!';
+            setTimeout(() => el.textContent = orig, 1500);
+        });
+    });
+
+    /* ===== CODE TABS ===== */
+    document.querySelectorAll('.code-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.code-block pre').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    /* ===== FADE IN ON SCROLL ===== */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    /* ===== HERO BACKGROUND CANVAS (Floating Particles) ===== */
+    (function() {
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h;
+        const particles = [];
+        const PARTICLE_COUNT = 80;
+        const CONNECTION_DIST = 150;
 
         function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight - document.querySelector('header').offsetHeight;
-            drawNetwork();
+            w = canvas.width = canvas.offsetWidth;
+            h = canvas.height = canvas.offsetHeight;
         }
 
         window.addEventListener('resize', resize);
+        resize();
 
-        function buildNetwork(archStr) {
-            const sizes = archStr.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
-            if (sizes.length < 2) {
-                alert("Please provide at least 2 layers (e.g., 2,4,1)");
-                return;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            particles.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                r: Math.random() * 2 + 1
+            });
+        }
+
+        function drawHero() {
+            ctx.clearRect(0, 0, w, h);
+
+            // Connections
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < CONNECTION_DIST) {
+                        const alpha = (1 - dist / CONNECTION_DIST) * 0.15;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
             }
 
-            layers = sizes;
+            // Particles
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.4)';
+                ctx.fill();
+
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > w) p.vx *= -1;
+                if (p.y < 0 || p.y > h) p.vy *= -1;
+            });
+
+            requestAnimationFrame(drawHero);
+        }
+        drawHero();
+    })();
+
+    /* ===== INTERACTIVE NEURAL NETWORK DEMO ===== */
+    (function() {
+        const canvas = document.getElementById('demo-canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H;
+        let nodes = [];
+        let edges = [];
+        let layerSizes = [];
+        let animating = false;
+        let animProgress = 0;
+        let hoveredNode = null;
+
+        function resize() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            W = canvas.width = rect.width * window.devicePixelRatio;
+            H = canvas.height = rect.height * window.devicePixelRatio;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+            draw();
+        }
+
+        function buildGraph(archStr) {
+            const sizes = archStr.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+            if (sizes.length < 2) return;
+            layerSizes = sizes;
             nodes = [];
             edges = [];
 
-            const layerSpacing = width / (layers.length + 1);
+            const drawW = W / window.devicePixelRatio;
+            const drawH = H / window.devicePixelRatio;
+            const padX = 80;
+            const padY = 50;
+            const usableW = drawW - padX * 2;
+            const usableH = drawH - padY * 2;
+            const layerSpacing = usableW / (sizes.length - 1);
 
-            // Create nodes
-            layers.forEach((size, layerIndex) => {
-                const x = layerSpacing * (layerIndex + 1);
-                const nodeSpacing = height / (size + 1);
-                
-                for (let i = 0; i < size; i++) {
-                    const y = nodeSpacing * (i + 1);
+            // Layer labels
+            const layerLabels = sizes.map((_, i) => {
+                if (i === 0) return 'Input';
+                if (i === sizes.length - 1) return 'Output';
+                return 'Hidden ' + i;
+            });
+
+            sizes.forEach((size, li) => {
+                const x = padX + li * layerSpacing;
+                const nodeSpacing = usableH / (size + 1);
+                for (let ni = 0; ni < size; ni++) {
+                    const y = padY + nodeSpacing * (ni + 1);
                     nodes.push({
-                        id: `${layerIndex}-${i}`,
-                        layer: layerIndex,
-                        x: x,
-                        y: y,
-                        value: Math.random(), // current activation
-                        targetValue: Math.random() // next activation after forward pass
+                        layer: li,
+                        index: ni,
+                        x, y,
+                        activation: Math.random(),
+                        targetAct: Math.random(),
+                        label: layerLabels[li]
                     });
                 }
             });
 
-            // Create edges
-            for (let l = 0; l < layers.length - 1; l++) {
-                const currentLayerNodes = nodes.filter(n => n.layer === l);
-                const nextLayerNodes = nodes.filter(n => n.layer === l + 1);
-
-                currentLayerNodes.forEach(source => {
-                    nextLayerNodes.forEach(target => {
+            for (let l = 0; l < sizes.length - 1; l++) {
+                const src = nodes.filter(n => n.layer === l);
+                const tgt = nodes.filter(n => n.layer === l + 1);
+                src.forEach(s => {
+                    tgt.forEach(t => {
                         edges.push({
-                            source,
-                            target,
-                            weight: (Math.random() * 2 - 1) // -1 to 1
+                            source: s, target: t,
+                            weight: Math.random() * 2 - 1
                         });
                     });
                 });
@@ -256,113 +1288,161 @@
             resize();
         }
 
-        function drawNetwork() {
-            ctx.clearRect(0, 0, width, height);
+        function draw() {
+            const drawW = W / window.devicePixelRatio;
+            const drawH = H / window.devicePixelRatio;
+            ctx.clearRect(0, 0, drawW, drawH);
 
-            // Draw edges
-            edges.forEach(edge => {
+            // Edges
+            edges.forEach(e => {
+                const absW = Math.abs(e.weight);
+                const alpha = absW * 0.5 + 0.05;
+
                 ctx.beginPath();
-                ctx.moveTo(edge.source.x, edge.source.y);
-                ctx.lineTo(edge.target.x, edge.target.y);
-                
-                const isPositive = edge.weight > 0;
-                const baseAlpha = Math.abs(edge.weight) * 0.4 + 0.1;
-                
+                ctx.moveTo(e.source.x, e.source.y);
+                ctx.lineTo(e.target.x, e.target.y);
+
                 if (animating) {
-                    // Animate data flow
-                    const gradient = ctx.createLinearGradient(edge.source.x, edge.source.y, edge.target.x, edge.target.y);
-                    const stop = animationProgress;
-                    
-                    gradient.addColorStop(0, `rgba(59, 130, 246, ${baseAlpha * 0.2})`);
-                    if (stop > 0 && stop < 1) {
-                        const pulseWidth = 0.1;
-                        const startPulse = Math.max(0, stop - pulseWidth);
-                        const endPulse = Math.min(1, stop + pulseWidth);
-                        
-                        gradient.addColorStop(startPulse, `rgba(59, 130, 246, ${baseAlpha * 0.2})`);
-                        gradient.addColorStop(stop, `rgba(16, 185, 129, ${baseAlpha + 0.6})`); // bright green pulse
-                        gradient.addColorStop(endPulse, `rgba(139, 92, 246, ${baseAlpha * 0.2})`);
+                    const edgeLayer = e.source.layer;
+                    const layerProgress = animProgress * layerSizes.length;
+                    const edgePhase = layerProgress - edgeLayer;
+
+                    if (edgePhase > 0 && edgePhase < 1.5) {
+                        const pulse = Math.max(0, 1 - Math.abs(edgePhase - 0.5) * 2);
+                        const grad = ctx.createLinearGradient(e.source.x, e.source.y, e.target.x, e.target.y);
+                        const glowAlpha = pulse * 0.8;
+                        grad.addColorStop(0, `rgba(16, 185, 129, ${glowAlpha})`);
+                        grad.addColorStop(1, `rgba(59, 130, 246, ${glowAlpha * 0.3})`);
+                        ctx.strokeStyle = grad;
+                        ctx.lineWidth = 2 + pulse * 2;
+                    } else {
+                        ctx.strokeStyle = e.weight > 0
+                            ? `rgba(59, 130, 246, ${alpha * 0.3})`
+                            : `rgba(244, 63, 94, ${alpha * 0.3})`;
+                        ctx.lineWidth = 1;
                     }
-                    gradient.addColorStop(1, `rgba(139, 92, 246, ${baseAlpha * 0.2})`);
-                    
-                    ctx.strokeStyle = gradient;
-                    ctx.lineWidth = 2.5;
                 } else {
-                    // Static edge color based on weight
-                    ctx.strokeStyle = isPositive ? `rgba(59, 130, 246, ${baseAlpha})` : `rgba(239, 68, 68, ${baseAlpha})`;
-                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = e.weight > 0
+                        ? `rgba(59, 130, 246, ${alpha})`
+                        : `rgba(244, 63, 94, ${alpha})`;
+                    ctx.lineWidth = 1 + absW;
                 }
-
                 ctx.stroke();
             });
 
-            // Draw nodes
+            // Nodes
             nodes.forEach(node => {
-                ctx.beginPath();
-                ctx.arc(node.x, node.y, 14, 0, Math.PI * 2);
-                
-                // Color node based on activation value (0 to 1)
-                const intensity = Math.floor(node.value * 150 + 50);
-                
-                ctx.fillStyle = `rgb(${intensity}, ${intensity}, ${intensity})`;
-                if (animating && animationProgress > (node.layer / layers.length)) {
-                    // Blend to target value during animation
-                    const blend = Math.floor((node.value * (1 - animationProgress) + node.targetValue * animationProgress) * 150 + 50);
-                    ctx.fillStyle = `rgb(${blend}, ${blend}, ${blend})`;
+                let act = node.activation;
+                if (animating) {
+                    const layerProgress = animProgress * layerSizes.length;
+                    const nodePhase = layerProgress - node.layer;
+                    if (nodePhase > 0) {
+                        const blend = Math.min(1, nodePhase);
+                        act = node.activation * (1 - blend) + node.targetAct * blend;
+                    }
                 }
 
+                const radius = 14;
+                const isHovered = hoveredNode === node;
+
+                // Glow
+                if (act > 0.5 || isHovered) {
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, radius + 8, 0, Math.PI * 2);
+                    const glowAlpha = isHovered ? 0.25 : act * 0.15;
+                    ctx.fillStyle = `rgba(16, 185, 129, ${glowAlpha})`;
+                    ctx.fill();
+                }
+
+                // Node body
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+
+                const brightness = Math.floor(act * 180 + 40);
+                const hue = act > 0.5 ? 160 : 220; // green vs blue tint
+                ctx.fillStyle = `hsl(${hue}, ${Math.floor(act * 40)}%, ${Math.floor(brightness * 0.15 + 8)}%)`;
                 ctx.fill();
-                
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+
+                ctx.lineWidth = isHovered ? 2.5 : 1.5;
+                ctx.strokeStyle = act > 0.5
+                    ? `rgba(16, 185, 129, ${0.5 + act * 0.5})`
+                    : `rgba(113, 113, 122, ${0.4 + act * 0.3})`;
                 ctx.stroke();
 
-                // Glow effect
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = `rgba(255, 255, 255, ${node.value * 0.5})`;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
+                // Value text
+                ctx.fillStyle = `rgba(250, 250, 250, ${0.5 + act * 0.5})`;
+                ctx.font = '500 10px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(act.toFixed(2), node.x, node.y);
+            });
+
+            // Layer labels at top
+            const labelSet = new Set();
+            nodes.forEach(n => {
+                const key = n.layer;
+                if (!labelSet.has(key)) {
+                    labelSet.add(key);
+                    ctx.fillStyle = 'rgba(161, 161, 170, 0.6)';
+                    ctx.font = '600 11px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(n.label, n.x, 24);
+                }
             });
         }
 
-        function animate() {
-            if (!animating) return;
-
-            animationProgress += 0.015;
-
-            if (animationProgress > 1) {
-                animating = false;
-                animationProgress = 0;
-                // Update node values for next state
-                nodes.forEach(n => {
-                    n.value = n.targetValue;
-                    n.targetValue = Math.random();
-                });
-                drawNetwork();
-                return;
-            }
-
-            drawNetwork();
-            requestAnimationFrame(animate);
-        }
-
-        document.getElementById('update-btn').addEventListener('click', () => {
-            const arch = document.getElementById('arch').value;
-            buildNetwork(arch);
+        // Mouse hover
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            hoveredNode = null;
+            nodes.forEach(n => {
+                const dx = n.x - mx;
+                const dy = n.y - my;
+                if (Math.sqrt(dx*dx + dy*dy) < 18) hoveredNode = n;
+            });
+            canvas.style.cursor = hoveredNode ? 'pointer' : 'default';
+            if (!animating) draw();
         });
 
-        document.getElementById('animate-btn').addEventListener('click', () => {
+        // Forward pass animation
+        function runForward() {
             if (animating) return;
             animating = true;
-            animationProgress = 0;
-            animate();
+            animProgress = 0;
+            nodes.forEach(n => n.targetAct = Math.random());
+
+            function step() {
+                animProgress += 0.008;
+                if (animProgress >= 1) {
+                    animating = false;
+                    animProgress = 0;
+                    nodes.forEach(n => { n.activation = n.targetAct; n.targetAct = Math.random(); });
+                    draw();
+                    return;
+                }
+                draw();
+                requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        document.getElementById('demo-rebuild').addEventListener('click', () => {
+            buildGraph(document.getElementById('demo-arch').value);
         });
 
-        // Initialize on load
-        setTimeout(() => {
-            buildNetwork(document.getElementById('arch').value);
-        }, 100);
+        document.getElementById('demo-forward').addEventListener('click', runForward);
 
+        window.addEventListener('resize', () => {
+            if (nodes.length > 0) {
+                buildGraph(document.getElementById('demo-arch').value);
+            }
+        });
+
+        // Init
+        setTimeout(() => buildGraph('2, 4, 4, 1'), 200);
+    })();
     </script>
 </body>
 </html>
