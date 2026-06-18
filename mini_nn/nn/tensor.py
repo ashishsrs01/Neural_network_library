@@ -145,6 +145,28 @@ class Tensor:
         return out     
 
 
+    def sum(self):
+
+        out = Tensor(np.sum(self.data), (self,), "sum")
+
+        def _baclward():
+            self.grad += np.ones_like(self.data) * out.grad
+
+        out._backward = _backward
+
+        return out
+
+
+    def mean(self):
+
+        out = Tensor(np.mean(self.data), (self,), "mean")
+
+        def _backward():
+            self.gard += (np.ones_like(self.data) / self.data.size) * out.grad
+
+            out,_backward = _backward
+
+            return out
 
 
 # x = Tensor([1,2,3,4])
