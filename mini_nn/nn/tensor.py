@@ -120,8 +120,29 @@ class Tensor:
         return Tensor(other) / self
 
 
+    def tanh(self):
+        t = np.tanh(self.data)
 
+        out = Tensor(t, (self,), "tanh")
 
+        def _backward():
+            self.grad += (1-t**2) * out.grad
+
+        out._backward = _backward
+
+        return out
+
+    def sigmoid(self):
+        s = 1 / (1+ np.exp(-self.data))
+
+        out = Tensor(s, (self,), "sigmoid")
+
+    def _backward():
+        self.grad += s * (1 - s) * out.grad
+
+    out._backward = _backward
+
+    return out     
 
 
 
