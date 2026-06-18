@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Neural Network Visualizer</title>
+    <meta name="description" content="Interactive visualization for the Mini Neural Network Python library.">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --accent: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Glassmorphism Header */
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .config {
+            background: rgba(0,0,0,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .config span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        main {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .info-panel {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 16px;
+            width: 320px;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .info-panel h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .info-panel p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .layer-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .layer-control input {
+            width: 60px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 4px;
+            padding: 0.3rem;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .layer-control input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mini Neural Network</h1>
+        <div class="controls">
+            <div class="config">
+                <div class="layer-control">
+                    <span>Architecture:</span>
+                    <input type="text" id="arch" value="2,4,4,1" title="Comma separated layer sizes">
+                </div>
+            </div>
+            <button id="update-btn">Update Graph</button>
+            <button id="animate-btn">Forward Pass</button>
+        </div>
+    </header>
+
+    <main>
+        <canvas id="network-canvas"></canvas>
+        
+        <div class="info-panel">
+            <h2>Interactive Visualization</h2>
+            <p>Welcome to the <strong>Mini Neural Network</strong> visualizer. This tool brings the underlying Python library to life directly in your browser.</p>
+            <p>Modify the architecture (e.g., <code>3,5,2</code>) and click <strong>Update Graph</strong> to reconstruct the network layout dynamically.</p>
+            <p>Click <strong>Forward Pass</strong> to visualize data flowing through the weights to compute activations.</p>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        let layers = [];
+        let nodes = [];
+        let edges = [];
+        let animating = false;
+        let animationProgress = 0;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight - document.querySelector('header').offsetHeight;
+            drawNetwork();
+        }
+
+        window.addEventListener('resize', resize);
+
+        function buildNetwork(archStr) {
+            const sizes = archStr.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+            if (sizes.length < 2) {
+                alert("Please provide at least 2 layers (e.g., 2,4,1)");
+                return;
+            }
+
+            layers = sizes;
+            nodes = [];
+            edges = [];
+
+            const layerSpacing = width / (layers.length + 1);
+
+            // Create nodes
+            layers.forEach((size, layerIndex) => {
+                const x = layerSpacing * (layerIndex + 1);
+                const nodeSpacing = height / (size + 1);
+                
+                for (let i = 0; i < size; i++) {
+                    const y = nodeSpacing * (i + 1);
+                    nodes.push({
+                        id: `${layerIndex}-${i}`,
+                        layer: layerIndex,
+                        x: x,
+                        y: y,
+                        value: Math.random(), // current activation
+                        targetValue: Math.random() // next activation after forward pass
+                    });
+                }
+            });
+
+            // Create edges
+            for (let l = 0; l < layers.length - 1; l++) {
+                const currentLayerNodes = nodes.filter(n => n.layer === l);
+                const nextLayerNodes = nodes.filter(n => n.layer === l + 1);
+
+                currentLayerNodes.forEach(source => {
+                    nextLayerNodes.forEach(target => {
+                        edges.push({
+                            source,
+                            target,
+                            weight: (Math.random() * 2 - 1) // -1 to 1
+                        });
+                    });
+                });
+            }
+
+            resize();
+        }
+
+        function drawNetwork() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw edges
+            edges.forEach(edge => {
+                ctx.beginPath();
+                ctx.moveTo(edge.source.x, edge.source.y);
+                ctx.lineTo(edge.target.x, edge.target.y);
+                
+                const isPositive = edge.weight > 0;
+                const baseAlpha = Math.abs(edge.weight) * 0.4 + 0.1;
+                
+                if (animating) {
+                    // Animate data flow
+                    const gradient = ctx.createLinearGradient(edge.source.x, edge.source.y, edge.target.x, edge.target.y);
+                    const stop = animationProgress;
+                    
+                    gradient.addColorStop(0, `rgba(59, 130, 246, ${baseAlpha * 0.2})`);
+                    if (stop > 0 && stop < 1) {
+                        const pulseWidth = 0.1;
+                        const startPulse = Math.max(0, stop - pulseWidth);
+                        const endPulse = Math.min(1, stop + pulseWidth);
+                        
+                        gradient.addColorStop(startPulse, `rgba(59, 130, 246, ${baseAlpha * 0.2})`);
+                        gradient.addColorStop(stop, `rgba(16, 185, 129, ${baseAlpha + 0.6})`); // bright green pulse
+                        gradient.addColorStop(endPulse, `rgba(139, 92, 246, ${baseAlpha * 0.2})`);
+                    }
+                    gradient.addColorStop(1, `rgba(139, 92, 246, ${baseAlpha * 0.2})`);
+                    
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 2.5;
+                } else {
+                    // Static edge color based on weight
+                    ctx.strokeStyle = isPositive ? `rgba(59, 130, 246, ${baseAlpha})` : `rgba(239, 68, 68, ${baseAlpha})`;
+                    ctx.lineWidth = 1.5;
+                }
+
+                ctx.stroke();
+            });
+
+            // Draw nodes
+            nodes.forEach(node => {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 14, 0, Math.PI * 2);
+                
+                // Color node based on activation value (0 to 1)
+                const intensity = Math.floor(node.value * 150 + 50);
+                
+                ctx.fillStyle = `rgb(${intensity}, ${intensity}, ${intensity})`;
+                if (animating && animationProgress > (node.layer / layers.length)) {
+                    // Blend to target value during animation
+                    const blend = Math.floor((node.value * (1 - animationProgress) + node.targetValue * animationProgress) * 150 + 50);
+                    ctx.fillStyle = `rgb(${blend}, ${blend}, ${blend})`;
+                }
+
+                ctx.fill();
+                
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.stroke();
+
+                // Glow effect
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `rgba(255, 255, 255, ${node.value * 0.5})`;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function animate() {
+            if (!animating) return;
+
+            animationProgress += 0.015;
+
+            if (animationProgress > 1) {
+                animating = false;
+                animationProgress = 0;
+                // Update node values for next state
+                nodes.forEach(n => {
+                    n.value = n.targetValue;
+                    n.targetValue = Math.random();
+                });
+                drawNetwork();
+                return;
+            }
+
+            drawNetwork();
+            requestAnimationFrame(animate);
+        }
+
+        document.getElementById('update-btn').addEventListener('click', () => {
+            const arch = document.getElementById('arch').value;
+            buildNetwork(arch);
+        });
+
+        document.getElementById('animate-btn').addEventListener('click', () => {
+            if (animating) return;
+            animating = true;
+            animationProgress = 0;
+            animate();
+        });
+
+        // Initialize on load
+        setTimeout(() => {
+            buildNetwork(document.getElementById('arch').value);
+        }, 100);
+
+    </script>
+</body>
+</html>

@@ -12,7 +12,7 @@ class MLP:
         for i in range(len(n_outs)):
             is_last = i == len(n_outs) - 1
             
-            self.layers.append(Layer(sz[i]
+            self.layers.append(Layer(sz[i],
                                      sz[i+1],
                                      activation = not is_last))
 

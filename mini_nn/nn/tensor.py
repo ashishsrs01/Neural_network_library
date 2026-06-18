@@ -107,16 +107,16 @@ class Tensor:
         out._backward = _backward
         return out
         
-    def _radd_(self, other):
+    def __radd__(self, other):
         return self + other
 
-    def _rsub_(self, other):
+    def __rsub__(self, other):
         return Tensor(other) - self
 
-    def _rmul_(self, other):
+    def __rmul__(self, other):
         return self * other
 
-    def _rtruediv_(self, other):
+    def __rtruediv__(self, other):
         return Tensor(other) / self
 
 
@@ -149,7 +149,7 @@ class Tensor:
 
         out = Tensor(np.sum(self.data), (self,), "sum")
 
-        def _baclward():
+        def _backward():
             self.grad += np.ones_like(self.data) * out.grad
 
         out._backward = _backward
@@ -162,11 +162,11 @@ class Tensor:
         out = Tensor(np.mean(self.data), (self,), "mean")
 
         def _backward():
-            self.gard += (np.ones_like(self.data) / self.data.size) * out.grad
+            self.grad += (np.ones_like(self.data) / self.data.size) * out.grad
 
-            out,_backward = _backward
+        out._backward = _backward
 
-            return out
+        return out
 
 
 # x = Tensor([1,2,3,4])
