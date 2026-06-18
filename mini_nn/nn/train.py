@@ -19,7 +19,7 @@ ys = [
 ]
 
 
-for epoch in range(200):
+for epoch in range(1000):
 
     total_loss = None
 
@@ -44,3 +44,15 @@ for epoch in range(200):
         print(epoch, total_loss.data)
 
 
+print("\nPredictions:")
+
+print("x=1 ->", model([1.0]))
+print("x=2 ->", model([2.0]))
+print("x=3 ->", model([3.0]))
+print("x=4 ->", model([4.0]))
+print("x=5 ->", model([5.0]))
+
+print("\nParameters:")
+
+for p in model.parameters():
+    print(p)

@@ -137,12 +137,12 @@ class Tensor:
 
         out = Tensor(s, (self,), "sigmoid")
 
-    def _backward():
-        self.grad += s * (1 - s) * out.grad
+        def _backward():
+            self.grad += s * (1 - s) * out.grad
 
-    out._backward = _backward
-
-    return out     
+        out._backward = _backward
+        
+        return out     
 
 
 
