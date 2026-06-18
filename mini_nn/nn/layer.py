@@ -3,7 +3,7 @@ from neuron import Neuron
 
 class Layer:
 
-    def __init__(self, n_in, n_out):
+    def __init__(self, n_in, n_out, activation = True):
 
         self.neurons = [Neuron(n_in)
                         for _ in range(n_out)]

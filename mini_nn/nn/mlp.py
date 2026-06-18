@@ -7,10 +7,14 @@ class MLP:
 
         sz = [n_in] + n_outs
 
-        self.layers= [
-                       Layer(sz[i], sz[i+1])
-                       for i in range(len(n_outs))
-        ]
+        self.layers= []
+
+        for i in range(len(n_outs)):
+            is_last = i == len(n_outs) - 1
+            
+            self.layers.append(Layer(sz[i]
+                                     sz[i+1],
+                                     activation = not is_last))
 
     def __call__(self, x):
 
